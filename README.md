@@ -3,7 +3,7 @@
 > A multi-tenant invoicing SaaS for freelancers and small agencies — create branded invoices, get paid online via Stripe, and let automated reminders chase late payments for you.
 
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.5%2B-777BB4?logo=php&logoColor=white)
 ![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
 ![Tests](https://img.shields.io/badge/Tests-Pest-8BC34A)
 ![License](https://img.shields.io/badge/License-MIT-blue)
@@ -31,7 +31,7 @@ Freelancers and small agencies lose real revenue to late payments and waste hour
 
 | Layer | Technology |
 |---|---|
-| Backend | PHP 8.3, Laravel 13 |
+| Backend | PHP 8.5, Laravel 13 |
 | Dashboard / Admin | Filament 5 (custom theme) |
 | Public pages | Livewire 4 + Tailwind CSS |
 | Database | MySQL 8 |
@@ -56,7 +56,7 @@ A few deliberate decisions, with their trade-offs:
 
 ### Requirements
 
-- PHP 8.3+
+- PHP 8.5+
 - Composer
 - MySQL 8
 - Node.js 20+ (asset build)
@@ -136,7 +136,7 @@ The suite prioritizes the parts that must never break: **tenant isolation**, **m
 
 Tested on a standard VPS / Laravel Forge setup:
 
-1. PHP 8.3 + MySQL 8 + Redis, behind Nginx with HTTPS
+1. PHP 8.5 + MySQL 8 + Redis, behind Nginx with HTTPS
 2. `php artisan migrate --force` on deploy
 3. `php artisan optimize` (config, route, view caching)
 4. Run queue workers under Supervisor; `php artisan queue:restart` on every deploy
