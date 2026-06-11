@@ -8,7 +8,8 @@
     "mcp": true,
     "nightwatch": false,
     "packages": [
-        "livewire/blaze"
+        "livewire/blaze",
+        "filament/filament"
     ],
     "sail": false,
     "skills": [

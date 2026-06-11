@@ -1,9 +1,9 @@
 {
     "mcpServers": {
         "laravel-boost": {
-            "command": "/usr/bin/php8.4",
+            "command": "/usr/bin/php8.5",
             "args": [
-                "/home/muneeb/Documents/Projects/invoiceflow-saas/artisan",
+                "/home/muneeb/Documents/projects/invoiceflow-saas/artisan",
                 "boost:mcp"
             ]
         }
