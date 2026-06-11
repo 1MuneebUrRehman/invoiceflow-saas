@@ -30,5 +30,14 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::livewire('/dashboard', 'pages::dashboard')->name('dashboard');
+
+    Route::livewire('/clients', 'pages::clients.index')->name('clients.index');
+    Route::livewire('/clients/create', 'pages::clients.create')->name('clients.create');
+    Route::livewire('/clients/{client}/edit', 'pages::clients.edit')->name('clients.edit');
+
+    Route::livewire('/invoices', 'pages::invoices.index')->name('invoices.index');
+    Route::livewire('/invoices/create', 'pages::invoices.create')->name('invoices.create');
+    Route::livewire('/invoices/{invoice}/edit', 'pages::invoices.edit')->name('invoices.edit');
+
     Route::post('/logout', LogoutController::class)->name('logout');
 });

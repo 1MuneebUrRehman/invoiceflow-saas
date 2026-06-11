@@ -81,13 +81,13 @@ new #[Title('Dashboard')] class extends Component
 
         <div class="flex items-center gap-2">
             <a
-                href="{{ route('filament.app.resources.clients.index') }}"
+                href="{{ route('clients.index') }}"
                 class="rounded-field bg-white px-4 py-2 text-sm font-medium text-midnight shadow-card ring-1 ring-midnight/10 transition hover:shadow-card-hover hover:ring-midnight/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
             >
                 Manage clients
             </a>
             <a
-                href="{{ route('filament.app.resources.invoices.create') }}"
+                href="{{ route('invoices.create') }}"
                 class="rounded-field bg-lapis px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-lapis-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
             >
                 + New invoice
@@ -163,7 +163,7 @@ new #[Title('Dashboard')] class extends Component
             <div class="mb-4 flex items-center justify-between">
                 <h2 class="font-display text-lg font-semibold text-midnight">Recent invoices</h2>
                 <a
-                    href="{{ route('filament.app.resources.invoices.index') }}"
+                    href="{{ route('invoices.index') }}"
                     class="text-sm font-medium text-lapis transition hover:text-lapis-deep"
                 >
                     View all →
@@ -186,7 +186,7 @@ new #[Title('Dashboard')] class extends Component
                             <tr class="group transition hover:bg-mist/60">
                                 <td class="px-5 py-3.5">
                                     <a
-                                        href="{{ route('filament.app.resources.invoices.edit', $invoice) }}"
+                                        href="{{ route('invoices.edit', $invoice) }}"
                                         class="font-semibold text-midnight group-hover:text-lapis transition"
                                     >
                                         {{ $invoice->number }}
@@ -235,7 +235,7 @@ new #[Title('Dashboard')] class extends Component
                 Add your first client, then create and send an invoice in minutes.
             </p>
             <a
-                href="{{ route('filament.app.resources.invoices.create') }}"
+                href="{{ route('invoices.create') }}"
                 class="mt-6 inline-flex items-center gap-2 rounded-field bg-lapis px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-lapis-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
             >
                 Create your first invoice

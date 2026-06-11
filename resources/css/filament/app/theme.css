@@ -4,12 +4,12 @@
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../resources/views/components/**/*';
 
+/* ─── Design tokens — must match app.css exactly ────────────────────────── */
+
 @theme {
-    /* Match app typography */
     --font-sans:    'Public Sans', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Fraunces', ui-serif, Georgia, serif;
 
-    /* Match app border radii */
     --radius-sm:  5px;
     --radius:     8px;
     --radius-md:  8px;
@@ -19,24 +19,54 @@
     --radius-3xl: 24px;
 }
 
-/* ─── App design tokens ──────────────────────────────────────────────────── */
+/* ─── Shared CSS variables ───────────────────────────────────────────────── */
 
 :root {
-    --color-midnight: #13283f;
-    --color-lapis:    #1f5eae;
-    --color-lapis-deep: #17498a;
-    --color-mist:     #f4f6fa;
-    --color-slate:    #5b6b7f;
+    --color-midnight:    #13283f;
+    --color-lapis:       #1f5eae;
+    --color-lapis-deep:  #17498a;
+    --color-mist:        #f4f6fa;
+    --color-slate:       #5b6b7f;
+    --color-verdant:     #2e7d5b;
+    --color-garnet:      #b42318;
 
     --shadow-card:       0 1px 2px rgb(19 40 63 / 0.05), 0 4px 16px rgb(19 40 63 / 0.05);
     --shadow-card-hover: 0 2px 4px rgb(19 40 63 / 0.06), 0 12px 32px rgb(19 40 63 / 0.1);
     --shadow-pop:        0 1px 2px rgb(19 40 63 / 0.05), 0 16px 48px -8px rgb(19 40 63 / 0.18);
 }
 
-/* ─── Topbar ─────────────────────────────────────────────────────────────── */
+/* ─── Body / page background — mist like the main app ───────────────────── */
+
+.fi-body {
+    background-color: var(--color-mist) !important;
+    font-family: var(--font-sans) !important;
+    color: var(--color-midnight) !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+.dark .fi-body {
+    background-color: #0d1c2e !important;
+}
+
+/* ─── Main content area ──────────────────────────────────────────────────── */
+
+.fi-main {
+    background-color: transparent !important;
+}
+
+.fi-main-ctn {
+    background-color: transparent !important;
+}
+
+/* ─── Topbar — glass effect matching app.blade.php header ───────────────── */
+
+.fi-topbar {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
 
 .fi-topbar nav {
-    background-color: color-mix(in srgb, white 88%, transparent) !important;
+    background-color: rgba(255, 255, 255, 0.88) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     border-bottom: 1px solid rgb(19 40 63 / 0.06) !important;
@@ -44,44 +74,81 @@
 }
 
 .dark .fi-topbar nav {
-    background-color: color-mix(in srgb, #0d1c2e 90%, transparent) !important;
+    background-color: rgba(13, 28, 46, 0.9) !important;
     border-bottom-color: rgb(255 255 255 / 0.06) !important;
 }
 
-/* ─── Page headings — Fraunces like the app ──────────────────────────────── */
+/* ─── Page heading & breadcrumbs ─────────────────────────────────────────── */
 
 .fi-header-heading {
     font-family: var(--font-display) !important;
     font-weight: 600 !important;
     letter-spacing: -0.025em !important;
+    color: var(--color-midnight) !important;
 }
 
-/* ─── Widgets / stat cards ───────────────────────────────────────────────── */
+.dark .fi-header-heading {
+    color: #f0f4f8 !important;
+}
+
+.fi-header-subheading {
+    color: var(--color-slate) !important;
+    font-size: 0.875rem !important;
+}
+
+.fi-breadcrumbs-item-label {
+    color: var(--color-slate) !important;
+    font-size: 0.8125rem !important;
+}
+
+.fi-breadcrumbs-item-label:hover {
+    color: var(--color-lapis) !important;
+}
+
+/* ─── Stat overview cards ────────────────────────────────────────────────── */
 
 .fi-wi-stats-overview-stat {
     background-color: white !important;
     border-radius: 14px !important;
     box-shadow: var(--shadow-card) !important;
     border: none !important;
-    ring-color: transparent !important;
     outline: 1px solid rgb(19 40 63 / 0.05) !important;
-    transition: box-shadow 0.2s ease !important;
+    transition: box-shadow 0.2s ease, outline-color 0.2s ease !important;
+    padding: 1.25rem 1.5rem !important;
 }
 
 .fi-wi-stats-overview-stat:hover {
     box-shadow: var(--shadow-card-hover) !important;
+    outline-color: rgb(19 40 63 / 0.1) !important;
 }
 
 .dark .fi-wi-stats-overview-stat {
-    background-color: rgb(19 40 63 / 0.6) !important;
+    background-color: rgb(19 40 63 / 0.55) !important;
     outline-color: rgb(255 255 255 / 0.06) !important;
 }
 
-/* Stats icon area — lapis tint like app's icon badges */
 .fi-wi-stats-overview-stat-icon {
     background-color: rgb(31 94 174 / 0.1) !important;
-    color: #1f5eae !important;
+    color: var(--color-lapis) !important;
     border-radius: 8px !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.025em !important;
+    color: var(--color-midnight) !important;
+    font-variant-numeric: tabular-nums !important;
+}
+
+.dark .fi-wi-stats-overview-stat-value {
+    color: #f0f4f8 !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--color-slate) !important;
 }
 
 /* ─── Tables ─────────────────────────────────────────────────────────────── */
@@ -91,41 +158,231 @@
     border-radius: 14px !important;
     box-shadow: var(--shadow-card) !important;
     outline: 1px solid rgb(19 40 63 / 0.05) !important;
+    overflow: hidden !important;
+    transition: box-shadow 0.2s ease !important;
 }
 
 .dark .fi-ta-ctn {
-    background-color: rgb(19 40 63 / 0.5) !important;
+    background-color: rgb(19 40 63 / 0.55) !important;
     outline-color: rgb(255 255 255 / 0.06) !important;
 }
 
-/* ─── Section / form cards ───────────────────────────────────────────────── */
+/* Table header row */
+.fi-ta thead th {
+    background-color: transparent !important;
+    color: var(--color-slate) !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    border-bottom: 1px solid rgb(19 40 63 / 0.07) !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+}
+
+.dark .fi-ta thead th {
+    border-bottom-color: rgb(255 255 255 / 0.07) !important;
+    color: rgb(91 107 127 / 0.8) !important;
+}
+
+/* Table body rows */
+.fi-ta tbody tr {
+    border-bottom: 1px solid rgb(19 40 63 / 0.05) !important;
+    transition: background-color 0.1s ease !important;
+}
+
+.fi-ta tbody tr:last-child {
+    border-bottom: none !important;
+}
+
+.fi-ta tbody tr:hover {
+    background-color: rgb(244 246 250 / 0.7) !important;
+}
+
+.dark .fi-ta tbody tr {
+    border-bottom-color: rgb(255 255 255 / 0.05) !important;
+}
+
+.dark .fi-ta tbody tr:hover {
+    background-color: rgb(255 255 255 / 0.03) !important;
+}
+
+.fi-ta-cell {
+    color: var(--color-midnight) !important;
+}
+
+.dark .fi-ta-cell {
+    color: #d0dae6 !important;
+}
+
+/* ─── Sections / form cards ──────────────────────────────────────────────── */
 
 .fi-section {
     background-color: white !important;
     border-radius: 14px !important;
     box-shadow: var(--shadow-card) !important;
     outline: 1px solid rgb(19 40 63 / 0.05) !important;
+    transition: box-shadow 0.2s ease !important;
 }
 
 .dark .fi-section {
-    background-color: rgb(19 40 63 / 0.5) !important;
+    background-color: rgb(19 40 63 / 0.55) !important;
     outline-color: rgb(255 255 255 / 0.06) !important;
 }
 
-/* ─── Generic widget wrappers ────────────────────────────────────────────── */
+.fi-section-header {
+    border-bottom: 1px solid rgb(19 40 63 / 0.07) !important;
+    padding-bottom: 1rem !important;
+}
 
-.fi-wi-account,
-.fi-wi-chart {
+.dark .fi-section-header {
+    border-bottom-color: rgb(255 255 255 / 0.07) !important;
+}
+
+.fi-section-header-heading {
+    font-family: var(--font-display) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--color-midnight) !important;
+}
+
+.dark .fi-section-header-heading {
+    color: #f0f4f8 !important;
+}
+
+/* ─── Chart / generic widget wrappers ───────────────────────────────────── */
+
+.fi-wi-chart,
+[class*='fi-wi-'] {
     background-color: white !important;
     border-radius: 14px !important;
     box-shadow: var(--shadow-card) !important;
     outline: 1px solid rgb(19 40 63 / 0.05) !important;
 }
 
-.dark .fi-wi-account,
-.dark .fi-wi-chart {
-    background-color: rgb(19 40 63 / 0.5) !important;
+.dark .fi-wi-chart,
+.dark [class*='fi-wi-'] {
+    background-color: rgb(19 40 63 / 0.55) !important;
     outline-color: rgb(255 255 255 / 0.06) !important;
+}
+
+/* But stat cards have their own treatment above — reset the wildcard */
+.fi-wi-stats-overview-stat {
+    background-color: white !important;
+}
+
+/* ─── Form inputs — match rounded-field (8px) ────────────────────────────── */
+
+.fi-input,
+.fi-select-input,
+.fi-fo-text-input,
+.fi-fo-select-native {
+    border-radius: 8px !important;
+    border-color: rgb(19 40 63 / 0.15) !important;
+    color: var(--color-midnight) !important;
+    background-color: white !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.fi-input:focus,
+.fi-select-input:focus,
+.fi-fo-text-input:focus {
+    border-color: var(--color-lapis) !important;
+    box-shadow: 0 0 0 3px rgb(31 94 174 / 0.12) !important;
+    outline: none !important;
+}
+
+.dark .fi-input,
+.dark .fi-select-input,
+.dark .fi-fo-text-input {
+    background-color: rgb(19 40 63 / 0.6) !important;
+    border-color: rgb(255 255 255 / 0.1) !important;
+    color: #d0dae6 !important;
+}
+
+.fi-input-wrp {
+    border-radius: 8px !important;
+    border-color: rgb(19 40 63 / 0.15) !important;
+    background-color: white !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.fi-input-wrp:focus-within {
+    border-color: var(--color-lapis) !important;
+    box-shadow: 0 0 0 3px rgb(31 94 174 / 0.12) !important;
+    outline: none !important;
+}
+
+.dark .fi-input-wrp {
+    background-color: rgb(19 40 63 / 0.6) !important;
+    border-color: rgb(255 255 255 / 0.1) !important;
+}
+
+/* Form field labels */
+.fi-fo-field-wrp-label label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--color-midnight) !important;
+}
+
+.dark .fi-fo-field-wrp-label label {
+    color: #d0dae6 !important;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+/* Primary filled button */
+.fi-btn[data-size="md"],
+.fi-btn {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease !important;
+}
+
+/* Outlined/secondary button */
+.fi-btn.fi-outlined {
+    background-color: white !important;
+    border-color: rgb(19 40 63 / 0.15) !important;
+    color: var(--color-midnight) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+.fi-btn.fi-outlined:hover {
+    background-color: var(--color-mist) !important;
+    border-color: rgb(19 40 63 / 0.25) !important;
+}
+
+.dark .fi-btn.fi-outlined {
+    background-color: rgb(19 40 63 / 0.55) !important;
+    border-color: rgb(255 255 255 / 0.1) !important;
+    color: #d0dae6 !important;
+}
+
+/* ─── Tabs (sub-navigation) ──────────────────────────────────────────────── */
+
+.fi-tabs {
+    border-bottom: 1px solid rgb(19 40 63 / 0.07) !important;
+    gap: 0 !important;
+}
+
+.fi-tabs-tab {
+    border-radius: 8px 8px 0 0 !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--color-slate) !important;
+    transition: color 0.15s ease, background-color 0.15s ease !important;
+}
+
+.fi-tabs-tab:hover {
+    color: var(--color-midnight) !important;
+    background-color: rgb(244 246 250 / 0.6) !important;
+}
+
+.fi-tabs-tab[aria-selected='true'] {
+    color: var(--color-lapis) !important;
+    border-bottom-color: var(--color-lapis) !important;
+    font-weight: 600 !important;
 }
 
 /* ─── Modals ─────────────────────────────────────────────────────────────── */
@@ -133,4 +390,164 @@
 .fi-modal-window {
     border-radius: 20px !important;
     box-shadow: var(--shadow-pop) !important;
+    background-color: white !important;
+    outline: 1px solid rgb(19 40 63 / 0.07) !important;
+}
+
+.dark .fi-modal-window {
+    background-color: #152133 !important;
+    outline-color: rgb(255 255 255 / 0.07) !important;
+}
+
+.fi-modal-header {
+    border-bottom: 1px solid rgb(19 40 63 / 0.07) !important;
+}
+
+.dark .fi-modal-header {
+    border-bottom-color: rgb(255 255 255 / 0.07) !important;
+}
+
+.fi-modal-heading {
+    font-family: var(--font-display) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--color-midnight) !important;
+}
+
+.dark .fi-modal-heading {
+    color: #f0f4f8 !important;
+}
+
+/* Modal backdrop */
+.fi-modal-close-overlay {
+    background-color: rgb(19 40 63 / 0.35) !important;
+    backdrop-filter: blur(2px) !important;
+}
+
+/* ─── Dropdown panels ────────────────────────────────────────────────────── */
+
+.fi-dropdown-panel {
+    background-color: white !important;
+    border-radius: 12px !important;
+    box-shadow: var(--shadow-pop) !important;
+    outline: 1px solid rgb(19 40 63 / 0.07) !important;
+    overflow: hidden !important;
+}
+
+.dark .fi-dropdown-panel {
+    background-color: #152133 !important;
+    outline-color: rgb(255 255 255 / 0.07) !important;
+}
+
+/* ─── Notifications ──────────────────────────────────────────────────────── */
+
+.fi-no-notification {
+    border-radius: 12px !important;
+    box-shadow: var(--shadow-pop) !important;
+    outline: 1px solid rgb(19 40 63 / 0.07) !important;
+}
+
+/* ─── Empty state ────────────────────────────────────────────────────────── */
+
+.fi-empty-state {
+    padding: 3.5rem 2rem !important;
+}
+
+.fi-empty-state-icon {
+    background-color: rgb(31 94 174 / 0.08) !important;
+    color: var(--color-lapis) !important;
+    border-radius: 50% !important;
+    padding: 1rem !important;
+}
+
+.fi-empty-state-heading {
+    font-family: var(--font-display) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--color-midnight) !important;
+    margin-top: 1rem !important;
+}
+
+.fi-empty-state-description {
+    color: var(--color-slate) !important;
+    font-size: 0.875rem !important;
+}
+
+/* ─── Pagination ─────────────────────────────────────────────────────────── */
+
+.fi-pagination {
+    border-top: 1px solid rgb(19 40 63 / 0.06) !important;
+    padding: 0.75rem 1.25rem !important;
+}
+
+.fi-pagination-record-count {
+    color: var(--color-slate) !important;
+    font-size: 0.8125rem !important;
+}
+
+/* ─── Badge (status chips) ───────────────────────────────────────────────── */
+
+.fi-badge {
+    border-radius: 9999px !important;
+    font-size: 0.6875rem !important;
+    font-weight: 500 !important;
+    padding: 0.1875rem 0.625rem !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* ─── Number / money cells ───────────────────────────────────────────────── */
+
+[data-money],
+.fi-ta-cell [class*='tabular'] {
+    font-variant-numeric: tabular-nums !important;
+}
+
+/* ─── Sidebar (when not using top nav) ───────────────────────────────────── */
+
+.fi-sidebar {
+    background-color: white !important;
+    border-right: 1px solid rgb(19 40 63 / 0.07) !important;
+    box-shadow: none !important;
+}
+
+.dark .fi-sidebar {
+    background-color: #0f1e30 !important;
+    border-right-color: rgb(255 255 255 / 0.06) !important;
+}
+
+.fi-sidebar-nav-groups {
+    padding: 0.5rem 0.75rem !important;
+}
+
+/* ─── Page action buttons row ────────────────────────────────────────────── */
+
+.fi-header-actions-ctn {
+    gap: 0.5rem !important;
+}
+
+/* ─── Fieldset inside forms ──────────────────────────────────────────────── */
+
+.fi-fo-fieldset {
+    border-color: rgb(19 40 63 / 0.1) !important;
+    border-radius: 10px !important;
+}
+
+.dark .fi-fo-fieldset {
+    border-color: rgb(255 255 255 / 0.08) !important;
+}
+
+/* ─── Loading spinner color ──────────────────────────────────────────────── */
+
+.fi-loading-indicator {
+    color: var(--color-lapis) !important;
+}
+
+/* ─── Global link color ──────────────────────────────────────────────────── */
+
+.fi-link {
+    color: var(--color-lapis) !important;
+}
+
+.fi-link:hover {
+    color: var(--color-lapis-deep) !important;
 }
