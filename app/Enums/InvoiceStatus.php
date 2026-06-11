@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum InvoiceStatus: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum InvoiceStatus: string implements HasColor, HasLabel
 {
     case Draft = 'draft';
     case Sent = 'sent';
@@ -18,6 +21,24 @@ enum InvoiceStatus: string
             self::Paid => 'Paid',
             self::Overdue => 'Overdue',
             self::Cancelled => 'Cancelled',
+        };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
+
+    /**
+     * Filament badge color for panel tables and infolists.
+     */
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Draft, self::Cancelled => 'gray',
+            self::Sent => 'info',
+            self::Paid => 'success',
+            self::Overdue => 'danger',
         };
     }
 

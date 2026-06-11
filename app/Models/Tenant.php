@@ -23,6 +23,41 @@ class Tenant extends Model
     use HasFactory;
 
     /**
+     * Currencies offered across the app (clients, invoices, tenant default).
+     *
+     * @return array<string, string>
+     */
+    public static function currencyOptions(): array
+    {
+        return [
+            'USD' => 'USD — US Dollar',
+            'EUR' => 'EUR — Euro',
+            'GBP' => 'GBP — British Pound',
+            'CAD' => 'CAD — Canadian Dollar',
+            'AUD' => 'AUD — Australian Dollar',
+            'NZD' => 'NZD — New Zealand Dollar',
+            'CHF' => 'CHF — Swiss Franc',
+            'JPY' => 'JPY — Japanese Yen',
+            'CNY' => 'CNY — Chinese Yuan',
+            'INR' => 'INR — Indian Rupee',
+            'PKR' => 'PKR — Pakistani Rupee',
+            'BDT' => 'BDT — Bangladeshi Taka',
+            'AED' => 'AED — UAE Dirham',
+            'SAR' => 'SAR — Saudi Riyal',
+            'SGD' => 'SGD — Singapore Dollar',
+            'HKD' => 'HKD — Hong Kong Dollar',
+            'SEK' => 'SEK — Swedish Krona',
+            'NOK' => 'NOK — Norwegian Krone',
+            'DKK' => 'DKK — Danish Krone',
+            'PLN' => 'PLN — Polish Zloty',
+            'TRY' => 'TRY — Turkish Lira',
+            'ZAR' => 'ZAR — South African Rand',
+            'BRL' => 'BRL — Brazilian Real',
+            'MXN' => 'MXN — Mexican Peso',
+        ];
+    }
+
+    /**
      * @return HasMany<User, $this>
      */
     public function users(): HasMany

@@ -41,10 +41,29 @@ new #[Title('Dashboard')] class extends Component
 ?>
 
 <div>
-    <h1 class="font-display text-3xl font-semibold tracking-tight">
-        Welcome back, {{ Str::before(auth()->user()->name, ' ') }}
-    </h1>
-    <p class="mt-1 text-sm text-slate">Here's where your business stands today.</p>
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h1 class="font-display text-3xl font-semibold tracking-tight">
+                Welcome back, {{ Str::before(auth()->user()->name, ' ') }}
+            </h1>
+            <p class="mt-1 text-sm text-slate">Here's where your business stands today.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a
+                href="{{ route('filament.app.resources.clients.index') }}"
+                class="rounded-field bg-white px-4 py-2 text-sm font-medium text-midnight shadow-sm ring-1 ring-midnight/10 transition hover:bg-mist focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
+            >
+                Manage clients
+            </a>
+            <a
+                href="{{ route('filament.app.resources.invoices.index') }}"
+                class="rounded-field bg-lapis px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-lapis-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
+            >
+                Open invoices
+            </a>
+        </div>
+    </div>
 
     <div class="mt-8 grid gap-4 sm:grid-cols-3">
         <div class="rounded-card bg-white p-6 shadow-card ring-1 ring-midnight/5 transition hover:shadow-card-hover">
@@ -102,8 +121,14 @@ new #[Title('Dashboard')] class extends Component
             </span>
             <h2 class="mt-4 font-display text-xl font-semibold">No invoices yet</h2>
             <p class="mx-auto mt-2 max-w-sm text-sm text-slate">
-                Your invoicing workspace is ready. Client and invoice management arrive with the full dashboard.
+                Add your first client, then create and send an invoice in minutes.
             </p>
+            <a
+                href="{{ route('filament.app.resources.invoices.create') }}"
+                class="mt-5 inline-flex items-center gap-2 rounded-field bg-lapis px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-lapis-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
+            >
+                Create your first invoice
+            </a>
         </div>
     @endif
 </div>

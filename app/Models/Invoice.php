@@ -120,4 +120,22 @@ class Invoice extends Model
     {
         return max(0, $this->total - $this->amount_paid);
     }
+
+    /**
+     * Recompute subtotal, tax and total from the persisted line items.
+     *
+     * The database is the source of truth — client-side totals shown in
+     * forms are previews only and are never persisted directly.
+     */
+    public function recalculateTotals(): void
+    {
+        $subtotal = (int) $this->items()->sum('amount');
+        $taxAmount = (int) round($subtotal * ((float) $this->tax_rate) / 100);
+
+        $this->forceFill([
+            'subtotal' => $subtotal,
+            'tax_amount' => $taxAmount,
+            'total' => $subtotal + $taxAmount,
+        ])->saveQuietly();
+    }
 }

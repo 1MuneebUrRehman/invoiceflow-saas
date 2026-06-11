@@ -33,7 +33,7 @@
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-2.5">
                             <span class="flex size-8 items-center justify-center rounded-full bg-lapis/10 text-xs font-semibold text-lapis">
-                                {{ collect(explode(' ', auth()->user()?->name ?? ''))->filter()->take(2)->map(fn (string $part): string => Str::upper(Str::substr($part, 0, 1)))->implode('') }}
+                                {{ Str::upper(auth()->user()?->initials() ?? '') }}
                             </span>
                             <span class="hidden text-sm font-medium text-midnight sm:inline">{{ auth()->user()?->name }}</span>
                         </div>

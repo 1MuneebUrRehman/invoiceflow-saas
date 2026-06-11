@@ -37,6 +37,17 @@ class InvoiceItem extends Model
     use HasFactory;
 
     /**
+     * The line amount is always derived from quantity × unit price so it
+     * can never drift from its inputs, regardless of where the save originates.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (InvoiceItem $item): void {
+            $item->amount = (int) round((float) $item->quantity * $item->unit_price);
+        });
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
