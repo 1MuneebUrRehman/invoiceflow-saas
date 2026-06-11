@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Resources\Clients\ClientResource;
 use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Widgets\RevenueChartWidget;
 use App\Filament\Widgets\StatsOverview;
 use Filament\Actions\Action;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -31,6 +32,11 @@ class Dashboard extends BaseDashboard
     public function getHeaderWidgetsColumns(): int|array
     {
         return 3;
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [RevenueChartWidget::class];
     }
 
     protected function getActions(): array

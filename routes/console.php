@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\MarkOverdueInvoices;
+use App\Console\Commands\SendInvoiceReminders;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Run at midnight so overdue status is correct before reminders fire.
+Schedule::command(MarkOverdueInvoices::class)->dailyAt('00:05');
+Schedule::command(SendInvoiceReminders::class)->dailyAt('09:00');

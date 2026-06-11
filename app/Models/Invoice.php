@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $paid_at
  * @property string|null $notes
  * @property string|null $pdf_path
+ * @property array<int, int> $reminders_sent
  * @property CarbonImmutable|null $deleted_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -50,6 +51,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'issue_date',
     'due_date',
     'notes',
+    'reminders_sent',
 ])]
 class Invoice extends Model
 {
@@ -86,6 +88,7 @@ class Invoice extends Model
             'due_date' => 'date',
             'sent_at' => 'datetime',
             'paid_at' => 'datetime',
+            'reminders_sent' => 'array',
         ];
     }
 

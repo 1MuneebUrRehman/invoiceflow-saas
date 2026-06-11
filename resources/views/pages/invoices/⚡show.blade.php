@@ -1,14 +1,16 @@
 <?php
 
+use App\Actions\Invoices\CreateStripeCheckoutSession;
+use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use App\Models\Scopes\TenantScope;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Support\Facades\Storage;
 
 new #[Layout('layouts::public')] #[Title('Invoice')] class extends Component
 {
@@ -29,6 +31,16 @@ new #[Layout('layouts::public')] #[Title('Invoice')] class extends Component
         abort_unless(filled($this->invoice->pdf_path), 404);
 
         return Storage::disk('local')->download($this->invoice->pdf_path, "{$this->invoice->number}.pdf");
+    }
+
+    public function payWithStripe(): mixed
+    {
+        abort_unless($this->invoice->status->isPayable(), 403);
+        abort_unless(filled(config('services.stripe.secret')), 501, 'Stripe is not configured.');
+
+        $checkoutUrl = app(CreateStripeCheckoutSession::class)->execute($this->invoice);
+
+        return redirect()->away($checkoutUrl);
     }
 
     public function formatMoney(int $minorUnits): string
@@ -108,6 +120,20 @@ new #[Layout('layouts::public')] #[Title('Invoice')] class extends Component
                     </p>
                     @if ($invoice->status === \App\Enums\InvoiceStatus::Paid)
                         <p class="mt-1 text-xs font-medium text-verdant">Paid in full — thank you!</p>
+                    @elseif ($invoice->status->isPayable() && filled(config('services.stripe.secret')))
+                        <button
+                            type="button"
+                            wire:click="payWithStripe"
+                            wire:loading.attr="disabled"
+                            class="mt-3 inline-flex items-center gap-2 rounded-field bg-lapis px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-lapis-deep disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
+                        >
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                                <line x1="1" y1="10" x2="23" y2="10" />
+                            </svg>
+                            <span wire:loading.remove wire:target="payWithStripe">Pay now</span>
+                            <span wire:loading wire:target="payWithStripe">Redirecting…</span>
+                        </button>
                     @endif
                 </div>
             </div>

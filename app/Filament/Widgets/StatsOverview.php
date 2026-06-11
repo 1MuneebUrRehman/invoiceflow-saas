@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\InvoiceStatus;
-use App\Models\Client;
 use App\Models\Invoice;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -28,11 +27,11 @@ class StatsOverview extends StatsOverviewWidget
             ->where('status', InvoiceStatus::Overdue)
             ->count();
 
-        $paidThisMonth = Invoice::query()
+        $paidThisMonth = (int) Invoice::query()
             ->where('status', InvoiceStatus::Paid)
             ->whereMonth('paid_at', now()->month)
             ->whereYear('paid_at', now()->year)
-            ->count();
+            ->sum('total');
 
         return [
             Stat::make('Outstanding', Number::currency($outstanding / 100, in: $currency))
@@ -40,15 +39,15 @@ class StatsOverview extends StatsOverviewWidget
                 ->descriptionIcon($overdueCount > 0 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
                 ->color($overdueCount > 0 ? 'danger' : 'success'),
 
-            Stat::make('Invoices', Invoice::count())
-                ->description("{$paidThisMonth} paid this month")
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('primary'),
+            Stat::make('Paid this month', Number::currency($paidThisMonth / 100, in: $currency))
+                ->description(now()->format('F Y'))
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('success'),
 
-            Stat::make('Clients', Client::count())
-                ->description('Across all active clients')
-                ->descriptionIcon('heroicon-m-users')
-                ->color('primary'),
+            Stat::make('Overdue', $overdueCount)
+                ->description($overdueCount === 0 ? 'Nothing overdue' : ($overdueCount === 1 ? '1 invoice needs attention' : "{$overdueCount} invoices need attention"))
+                ->descriptionIcon('heroicon-m-clock')
+                ->color($overdueCount > 0 ? 'danger' : 'gray'),
         ];
     }
 }
