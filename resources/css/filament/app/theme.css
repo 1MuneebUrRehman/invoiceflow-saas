@@ -1,0 +1,136 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/components/**/*';
+
+@theme {
+    /* Match app typography */
+    --font-sans:    'Public Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Fraunces', ui-serif, Georgia, serif;
+
+    /* Match app border radii */
+    --radius-sm:  5px;
+    --radius:     8px;
+    --radius-md:  8px;
+    --radius-lg:  14px;
+    --radius-xl:  14px;
+    --radius-2xl: 20px;
+    --radius-3xl: 24px;
+}
+
+/* ─── App design tokens ──────────────────────────────────────────────────── */
+
+:root {
+    --color-midnight: #13283f;
+    --color-lapis:    #1f5eae;
+    --color-lapis-deep: #17498a;
+    --color-mist:     #f4f6fa;
+    --color-slate:    #5b6b7f;
+
+    --shadow-card:       0 1px 2px rgb(19 40 63 / 0.05), 0 4px 16px rgb(19 40 63 / 0.05);
+    --shadow-card-hover: 0 2px 4px rgb(19 40 63 / 0.06), 0 12px 32px rgb(19 40 63 / 0.1);
+    --shadow-pop:        0 1px 2px rgb(19 40 63 / 0.05), 0 16px 48px -8px rgb(19 40 63 / 0.18);
+}
+
+/* ─── Topbar ─────────────────────────────────────────────────────────────── */
+
+.fi-topbar nav {
+    background-color: color-mix(in srgb, white 88%, transparent) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgb(19 40 63 / 0.06) !important;
+    box-shadow: none !important;
+}
+
+.dark .fi-topbar nav {
+    background-color: color-mix(in srgb, #0d1c2e 90%, transparent) !important;
+    border-bottom-color: rgb(255 255 255 / 0.06) !important;
+}
+
+/* ─── Page headings — Fraunces like the app ──────────────────────────────── */
+
+.fi-header-heading {
+    font-family: var(--font-display) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.025em !important;
+}
+
+/* ─── Widgets / stat cards ───────────────────────────────────────────────── */
+
+.fi-wi-stats-overview-stat {
+    background-color: white !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow-card) !important;
+    border: none !important;
+    ring-color: transparent !important;
+    outline: 1px solid rgb(19 40 63 / 0.05) !important;
+    transition: box-shadow 0.2s ease !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    box-shadow: var(--shadow-card-hover) !important;
+}
+
+.dark .fi-wi-stats-overview-stat {
+    background-color: rgb(19 40 63 / 0.6) !important;
+    outline-color: rgb(255 255 255 / 0.06) !important;
+}
+
+/* Stats icon area — lapis tint like app's icon badges */
+.fi-wi-stats-overview-stat-icon {
+    background-color: rgb(31 94 174 / 0.1) !important;
+    color: #1f5eae !important;
+    border-radius: 8px !important;
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────────────── */
+
+.fi-ta-ctn {
+    background-color: white !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow-card) !important;
+    outline: 1px solid rgb(19 40 63 / 0.05) !important;
+}
+
+.dark .fi-ta-ctn {
+    background-color: rgb(19 40 63 / 0.5) !important;
+    outline-color: rgb(255 255 255 / 0.06) !important;
+}
+
+/* ─── Section / form cards ───────────────────────────────────────────────── */
+
+.fi-section {
+    background-color: white !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow-card) !important;
+    outline: 1px solid rgb(19 40 63 / 0.05) !important;
+}
+
+.dark .fi-section {
+    background-color: rgb(19 40 63 / 0.5) !important;
+    outline-color: rgb(255 255 255 / 0.06) !important;
+}
+
+/* ─── Generic widget wrappers ────────────────────────────────────────────── */
+
+.fi-wi-account,
+.fi-wi-chart {
+    background-color: white !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow-card) !important;
+    outline: 1px solid rgb(19 40 63 / 0.05) !important;
+}
+
+.dark .fi-wi-account,
+.dark .fi-wi-chart {
+    background-color: rgb(19 40 63 / 0.5) !important;
+    outline-color: rgb(255 255 255 / 0.06) !important;
+}
+
+/* ─── Modals ─────────────────────────────────────────────────────────────── */
+
+.fi-modal-window {
+    border-radius: 20px !important;
+    box-shadow: var(--shadow-pop) !important;
+}
