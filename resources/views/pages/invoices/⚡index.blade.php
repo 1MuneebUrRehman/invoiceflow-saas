@@ -21,14 +21,18 @@ new #[Title('Invoices')] class extends Component
     #[Url]
     public string $status = '';
 
+    public bool $showTrashed = false;
+
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingStatus(): void { $this->resetPage(); }
+    public function updatingShowTrashed(): void { $this->resetPage(); }
 
     #[Computed]
     public function invoices()
     {
         return Invoice::query()
             ->with('client')
+            ->when($this->showTrashed, fn ($q) => $q->withTrashed())
             ->when($this->search, fn ($q) => $q->where(
                 fn ($q2) => $q2
                     ->where('number', 'like', "%{$this->search}%")
@@ -62,6 +66,13 @@ new #[Title('Invoices')] class extends Component
         Invoice::findOrFail($id)->delete();
         unset($this->invoices);
         $this->dispatch('notify', message: 'Invoice deleted.', type: 'success');
+    }
+
+    public function restore(int $id): void
+    {
+        Invoice::withTrashed()->findOrFail($id)->restore();
+        unset($this->invoices);
+        $this->dispatch('notify', message: 'Invoice restored.', type: 'success');
     }
 
     public function downloadPdf(int $id): mixed
@@ -138,7 +149,11 @@ new #[Title('Invoices')] class extends Component
                     class="w-full rounded-field border-0 bg-mist py-2 pl-9 pr-4 text-sm text-midnight placeholder-slate ring-1 ring-midnight/10 focus:ring-2 focus:ring-lapis/40 focus:outline-none"
                 >
             </div>
-            <span class="text-sm text-slate">{{ $this->invoices->total() }} {{ Str::plural('invoice', $this->invoices->total()) }}</span>
+            <label class="flex cursor-pointer items-center gap-2 text-sm text-slate">
+                <input wire:model.live="showTrashed" type="checkbox" class="rounded border-slate/30 text-lapis focus:ring-lapis/40">
+                Show deleted
+            </label>
+            <span class="hidden text-sm text-slate sm:inline">{{ $this->invoices->total() }} {{ Str::plural('invoice', $this->invoices->total()) }}</span>
         </div>
 
         @if ($this->invoices->isEmpty())
@@ -180,11 +195,16 @@ new #[Title('Invoices')] class extends Component
                                 'cancelled' => 'bg-slate/10 text-slate',
                             ][$invoice->status->value] ?? 'bg-slate/10 text-slate';
                         @endphp
-                        <tr class="group transition hover:bg-mist/60">
+                        <tr class="group transition {{ $invoice->trashed() ? 'opacity-50' : '' }} hover:bg-mist/60">
                             <td class="px-5 py-3.5">
-                                <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold text-midnight transition group-hover:text-lapis">
-                                    {{ $invoice->number }}
-                                </a>
+                                @if ($invoice->trashed())
+                                    <span class="font-semibold text-midnight">{{ $invoice->number }}</span>
+                                    <span class="ml-1.5 inline-flex items-center rounded-full bg-slate/10 px-2 py-0.5 text-xs font-medium text-slate">Deleted</span>
+                                @else
+                                    <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold text-midnight transition group-hover:text-lapis">
+                                        {{ $invoice->number }}
+                                    </a>
+                                @endif
                             </td>
                             <td class="px-5 py-3.5 text-slate">{{ $invoice->client?->name ?? '—' }}</td>
                             <td class="px-5 py-3.5">
@@ -198,38 +218,45 @@ new #[Title('Invoices')] class extends Component
                             </td>
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center justify-end gap-1.5 opacity-0 transition group-hover:opacity-100">
-                                    @if ($invoice->status === InvoiceStatus::Draft || $invoice->status->isPayable())
+                                    @if ($invoice->trashed())
                                         <button
-                                            wire:click="sendInvoice({{ $invoice->id }})"
-                                            wire:confirm="Send {{ $invoice->number }} to {{ $invoice->client?->email }}?"
-                                            class="rounded-field px-2.5 py-1.5 text-xs font-medium text-lapis ring-1 ring-lapis/20 transition hover:bg-lapis/8"
-                                            title="Send invoice"
+                                            wire:click="restore({{ $invoice->id }})"
+                                            class="rounded-field px-2.5 py-1.5 text-xs font-medium text-verdant ring-1 ring-verdant/20 transition hover:bg-verdant/8"
                                         >
-                                            Send
+                                            Restore
+                                        </button>
+                                    @else
+                                        @if ($invoice->status === InvoiceStatus::Draft || $invoice->status->isPayable())
+                                            <button
+                                                wire:click="sendInvoice({{ $invoice->id }})"
+                                                wire:confirm="Send {{ $invoice->number }} to {{ $invoice->client?->email }}?"
+                                                class="rounded-field px-2.5 py-1.5 text-xs font-medium text-lapis ring-1 ring-lapis/20 transition hover:bg-lapis/8"
+                                            >
+                                                Send
+                                            </button>
+                                        @endif
+                                        @if (filled($invoice->pdf_path))
+                                            <button
+                                                wire:click="downloadPdf({{ $invoice->id }})"
+                                                class="rounded-field px-2.5 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist"
+                                            >
+                                                PDF
+                                            </button>
+                                        @endif
+                                        <a
+                                            href="{{ route('invoices.edit', $invoice) }}"
+                                            class="rounded-field px-2.5 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist hover:text-midnight"
+                                        >
+                                            Edit
+                                        </a>
+                                        <button
+                                            wire:click="delete({{ $invoice->id }})"
+                                            wire:confirm="Delete {{ $invoice->number }}? This cannot be undone."
+                                            class="rounded-field px-2.5 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
+                                        >
+                                            Delete
                                         </button>
                                     @endif
-                                    @if (filled($invoice->pdf_path))
-                                        <button
-                                            wire:click="downloadPdf({{ $invoice->id }})"
-                                            class="rounded-field px-2.5 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist"
-                                            title="Download PDF"
-                                        >
-                                            PDF
-                                        </button>
-                                    @endif
-                                    <a
-                                        href="{{ route('invoices.edit', $invoice) }}"
-                                        class="rounded-field px-2.5 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist hover:text-midnight"
-                                    >
-                                        Edit
-                                    </a>
-                                    <button
-                                        wire:click="delete({{ $invoice->id }})"
-                                        wire:confirm="Delete {{ $invoice->number }}? This cannot be undone."
-                                        class="rounded-field px-2.5 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
-                                    >
-                                        Delete
-                                    </button>
                                 </div>
                             </td>
                         </tr>

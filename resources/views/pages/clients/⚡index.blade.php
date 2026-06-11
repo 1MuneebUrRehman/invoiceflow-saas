@@ -11,16 +11,16 @@ new #[Title('Clients')] class extends Component
     use WithPagination;
 
     public string $search = '';
+    public bool $showArchived = false;
 
-    public function updatingSearch(): void
-    {
-        $this->resetPage();
-    }
+    public function updatingSearch(): void { $this->resetPage(); }
+    public function updatingShowArchived(): void { $this->resetPage(); }
 
     #[Computed]
     public function clients()
     {
         return Client::query()
+            ->when($this->showArchived, fn ($q) => $q->withTrashed())
             ->when($this->search, fn ($q) => $q->where(
                 fn ($q2) => $q2
                     ->where('name', 'like', "%{$this->search}%")
@@ -37,6 +37,13 @@ new #[Title('Clients')] class extends Component
         Client::findOrFail($id)->delete();
         unset($this->clients);
         $this->dispatch('notify', message: 'Client archived.', type: 'success');
+    }
+
+    public function restore(int $id): void
+    {
+        Client::withTrashed()->findOrFail($id)->restore();
+        unset($this->clients);
+        $this->dispatch('notify', message: 'Client restored.', type: 'success');
     }
 };
 ?>
@@ -71,7 +78,11 @@ new #[Title('Clients')] class extends Component
                     class="w-full rounded-field border-0 bg-mist py-2 pl-9 pr-4 text-sm text-midnight placeholder-slate ring-1 ring-midnight/10 focus:ring-2 focus:ring-lapis/40 focus:outline-none"
                 >
             </div>
-            <span class="text-sm text-slate">{{ $this->clients->total() }} {{ Str::plural('client', $this->clients->total()) }}</span>
+            <label class="flex cursor-pointer items-center gap-2 text-sm text-slate">
+                <input wire:model.live="showArchived" type="checkbox" class="rounded border-slate/30 text-lapis focus:ring-lapis/40">
+                Show archived
+            </label>
+            <span class="hidden text-sm text-slate sm:inline">{{ $this->clients->total() }} {{ Str::plural('client', $this->clients->total()) }}</span>
         </div>
 
         @if ($this->clients->isEmpty())
@@ -103,11 +114,14 @@ new #[Title('Clients')] class extends Component
                 </thead>
                 <tbody class="divide-y divide-midnight/5">
                     @foreach ($this->clients as $client)
-                        <tr class="group transition hover:bg-mist/60">
+                        <tr class="group transition {{ $client->trashed() ? 'opacity-50' : '' }} hover:bg-mist/60">
                             <td class="px-5 py-3.5">
                                 <p class="font-semibold text-midnight">{{ $client->name }}</p>
                                 @if ($client->company_name)
                                     <p class="text-xs text-slate">{{ $client->company_name }}</p>
+                                @endif
+                                @if ($client->trashed())
+                                    <span class="mt-0.5 inline-flex items-center rounded-full bg-slate/10 px-2 py-0.5 text-xs font-medium text-slate">Archived</span>
                                 @endif
                             </td>
                             <td class="px-5 py-3.5 text-slate">{{ $client->email }}</td>
@@ -119,19 +133,28 @@ new #[Title('Clients')] class extends Component
                             <td class="hidden px-5 py-3.5 text-right text-slate sm:table-cell">{{ $client->invoices_count }}</td>
                             <td class="px-5 py-3.5 text-right">
                                 <div class="flex items-center justify-end gap-2 opacity-0 transition group-hover:opacity-100">
-                                    <a
-                                        href="{{ route('clients.edit', $client) }}"
-                                        class="rounded-field px-3 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist hover:text-midnight"
-                                    >
-                                        Edit
-                                    </a>
-                                    <button
-                                        wire:click="delete({{ $client->id }})"
-                                        wire:confirm="Archive {{ $client->name }}? Their invoices will be kept."
-                                        class="rounded-field px-3 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
-                                    >
-                                        Archive
-                                    </button>
+                                    @if ($client->trashed())
+                                        <button
+                                            wire:click="restore({{ $client->id }})"
+                                            class="rounded-field px-3 py-1.5 text-xs font-medium text-verdant ring-1 ring-verdant/20 transition hover:bg-verdant/8"
+                                        >
+                                            Restore
+                                        </button>
+                                    @else
+                                        <a
+                                            href="{{ route('clients.edit', $client) }}"
+                                            class="rounded-field px-3 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist hover:text-midnight"
+                                        >
+                                            Edit
+                                        </a>
+                                        <button
+                                            wire:click="delete({{ $client->id }})"
+                                            wire:confirm="Archive {{ $client->name }}? Their invoices will be kept."
+                                            class="rounded-field px-3 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
+                                        >
+                                            Archive
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
