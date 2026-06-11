@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TenantPlan;
 use Database\Factories\TenantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,14 +14,37 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $name
  * @property string $default_currency
+ * @property TenantPlan $plan
+ * @property string|null $stripe_id
+ * @property string|null $pm_type
+ * @property string|null $pm_last_four
+ * @property Carbon|null $trial_ends_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'default_currency'])]
+#[Fillable(['name', 'default_currency', 'plan', 'stripe_id', 'pm_type', 'pm_last_four', 'trial_ends_at'])]
 class Tenant extends Model
 {
     /** @use HasFactory<TenantFactory> */
     use HasFactory;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'plan' => TenantPlan::class,
+            'trial_ends_at' => 'datetime',
+        ];
+    }
+
+    public function isPro(): bool
+    {
+        return $this->plan === TenantPlan::Pro;
+    }
 
     /**
      * Currencies offered across the app (clients, invoices, tenant default).
