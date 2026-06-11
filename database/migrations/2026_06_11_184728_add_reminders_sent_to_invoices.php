@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('invoices', function (Blueprint $table): void {
-            $table->json('reminders_sent')->default('[]')->after('pdf_path');
+            $table->json('reminders_sent')->nullable()->after('pdf_path');
         });
     }
 

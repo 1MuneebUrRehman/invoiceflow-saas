@@ -27,7 +27,10 @@ class SendInvoiceReminders extends Command
                 ->where('status', InvoiceStatus::Overdue)
                 ->whereDate('due_date', '<=', today()->subDays($days))
                 ->whereDate('due_date', '>=', today()->subDays(90))
-                ->whereJsonDoesntContain('reminders_sent', $days)
+                ->where(function ($q) use ($days): void {
+                    $q->whereNull('reminders_sent')
+                        ->orWhereJsonDoesntContain('reminders_sent', $days);
+                })
                 ->with(['client', 'tenant'])
                 ->chunk(100, function ($invoices) use ($days, &$dispatched): void {
                     foreach ($invoices as $invoice) {
