@@ -11,17 +11,25 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
-        <div class="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+        <div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-12">
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+                <div class="absolute -top-48 left-1/2 size-[40rem] -translate-x-1/2 rounded-full bg-lapis/10 blur-3xl"></div>
+                <div class="absolute -right-40 -bottom-56 size-[30rem] rounded-full bg-verdant/10 blur-3xl"></div>
+            </div>
+
             <a
                 href="{{ route('home') }}"
-                class="rounded-field font-display text-2xl font-semibold tracking-tight text-midnight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lapis"
+                class="flex items-center gap-2.5 rounded-field focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lapis"
             >
-                InvoiceFlow
+                <x-ui.logo-mark class="size-9" />
+                <span class="font-display text-2xl font-semibold tracking-tight text-midnight">InvoiceFlow</span>
             </a>
 
             <main class="mt-8 w-full max-w-md">
                 {{ $slot }}
             </main>
+
+            <p class="mt-8 text-xs text-slate/70">&copy; {{ date('Y') }} InvoiceFlow. Invoicing that gets you paid.</p>
         </div>
     </body>
 </html>

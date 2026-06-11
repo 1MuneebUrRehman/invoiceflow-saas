@@ -52,7 +52,7 @@ new #[Layout('layouts::auth')] #[Title('Create your account')] class extends Com
 };
 ?>
 
-<div class="rounded-card bg-white p-8 shadow-card">
+<div class="rounded-modal bg-white p-8 shadow-pop ring-1 ring-midnight/5 sm:p-10">
     <h1 class="font-display text-2xl font-semibold tracking-tight">Create your account</h1>
     <p class="mt-1 text-sm text-slate">Start sending invoices in minutes.</p>
 
