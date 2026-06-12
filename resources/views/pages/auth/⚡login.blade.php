@@ -78,7 +78,15 @@ new #[Layout('layouts::auth')] #[Title('Sign in')] class extends Component
         </div>
 
         <div>
-            <x-ui.label for="password">Password</x-ui.label>
+            <div class="flex items-center justify-between">
+                <x-ui.label for="password">Password</x-ui.label>
+                <a
+                    href="{{ route('password.request') }}"
+                    class="text-xs font-medium text-lapis hover:text-lapis-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis"
+                >
+                    Forgot password?
+                </a>
+            </div>
             <x-ui.input id="password" type="password" wire:model="password" required autocomplete="current-password" />
             <x-ui.error for="password" />
         </div>

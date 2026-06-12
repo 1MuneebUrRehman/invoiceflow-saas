@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
+ * @property string|null $logo_path
  * @property string $default_currency
  * @property TenantPlan $plan
  * @property string|null $stripe_id
@@ -22,7 +23,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'default_currency', 'plan', 'stripe_id', 'pm_type', 'pm_last_four', 'trial_ends_at'])]
+#[Fillable(['name', 'logo_path', 'default_currency', 'plan', 'stripe_id', 'pm_type', 'pm_last_four', 'trial_ends_at'])]
 class Tenant extends Model
 {
     /** @use HasFactory<TenantFactory> */

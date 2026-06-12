@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Webhooks\StripeWebhookController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
@@ -26,6 +27,8 @@ Route::livewire('/invoice/{publicId}', 'pages::invoices.show')
 Route::middleware('guest')->group(function () {
     Route::livewire('/register', 'pages::auth.register')->name('register');
     Route::livewire('/login', 'pages::auth.login')->name('login');
+    Route::livewire('/forgot-password', 'pages::auth.forgot-password')->name('password.request');
+    Route::livewire('/reset-password/{token}', 'pages::auth.reset-password')->name('password.reset');
 });
 
 Route::middleware('auth')->group(function () {
@@ -38,6 +41,23 @@ Route::middleware('auth')->group(function () {
     Route::livewire('/invoices', 'pages::invoices.index')->name('invoices.index');
     Route::livewire('/invoices/create', 'pages::invoices.create')->name('invoices.create');
     Route::livewire('/invoices/{invoice}/edit', 'pages::invoices.edit')->name('invoices.edit');
+
+    Route::livewire('/settings', 'pages::settings')->name('settings');
+
+    // Email verification
+    Route::livewire('/email/verify', 'pages::auth.verify-email')->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+
+        return redirect()->route('dashboard');
+    })->middleware('signed')->name('verification.verify');
+
+    Route::post('/email/verify/resend', function () {
+        request()->user()->sendEmailVerificationNotification();
+
+        return back();
+    })->middleware('throttle:6,1')->name('verification.send');
 
     Route::post('/logout', LogoutController::class)->name('logout');
 });

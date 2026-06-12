@@ -125,8 +125,8 @@ new #[Title('Invoices')] class extends Component
                 wire:click="$set('status', '{{ $value }}')"
                 @class([
                     'rounded-full px-3.5 py-1.5 text-xs font-medium transition',
-                    'bg-midnight text-white shadow-sm' => $status === $value,
-                    'bg-white text-slate ring-1 ring-midnight/10 hover:ring-midnight/20 hover:text-midnight' => $status !== $value,
+                    'bg-midnight text-white shadow-sm dark:bg-lapis dark:text-white' => $status === $value,
+                    'bg-white text-slate ring-1 ring-midnight/10 hover:ring-midnight/20 hover:text-midnight dark:bg-white/6 dark:ring-white/10 dark:hover:ring-white/20 dark:hover:text-[#c8d8ed]' => $status !== $value,
                 ])
             >
                 {{ $label }}
