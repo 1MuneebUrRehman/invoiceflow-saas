@@ -20,7 +20,15 @@ function paymentUser(): array
 
 it('lists payments across all invoices for the tenant', function (): void {
     [$user, $tenant, $client] = paymentUser();
-    $invoice = Invoice::factory()->paid()->for($tenant)->for($client)->create();
+    $invoice = Invoice::factory()->sent()->for($tenant)->for($client)->create();
+
+    app(MarkInvoicePaid::class)->execute(
+        invoice: $invoice,
+        amount: $invoice->total,
+        currency: $invoice->currency,
+        provider: PaymentProvider::Manual,
+        providerReference: 'ref-100',
+    );
 
     $this->actingAs($user, 'sanctum')
         ->getJson('/api/v1/payments')

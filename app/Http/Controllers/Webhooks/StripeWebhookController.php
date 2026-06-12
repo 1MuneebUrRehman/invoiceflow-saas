@@ -27,7 +27,7 @@ class StripeWebhookController extends Controller
             return response('Invalid signature', 400);
         }
 
-        if ($event->type === 'checkout.session.completed') {
+        if ($event->type === 'checkout.session.completed' && $event->data->object instanceof Session) {
             $this->handleCheckoutCompleted($event->data->object);
         }
 

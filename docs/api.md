@@ -206,6 +206,15 @@ DELETE /v1/invoices/{id}
 ```
 Soft-deletes. **Response 204.**
 
+### Send invoice
+```
+POST /v1/invoices/{id}/send
+```
+Emails the invoice (with its PDF) to the client via a queued job chain. A `draft` invoice transitions to `sent`; a `sent` or `overdue` invoice is re-sent without changing status.
+
+**Response 200:** Invoice object.
+**Response 422:** Invoice is `paid` or `cancelled` and cannot be sent.
+
 ---
 
 ## Payments

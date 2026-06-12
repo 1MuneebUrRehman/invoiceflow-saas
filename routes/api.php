@@ -25,19 +25,20 @@ Route::prefix('v1')
         // Clients
         Route::apiResource('clients', ClientController::class);
 
-        // Invoices — creation is plan-gated
+        // Invoices — bound by public_id (ULID), creation is plan-gated
         Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::post('/invoices', [InvoiceController::class, 'store'])
             ->middleware(EnsureInvoiceLimit::class)
             ->name('invoices.store');
-        Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
-        Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
-        Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
+        Route::get('/invoices/{invoice:public_id}', [InvoiceController::class, 'show'])->name('invoices.show');
+        Route::put('/invoices/{invoice:public_id}', [InvoiceController::class, 'update'])->name('invoices.update');
+        Route::delete('/invoices/{invoice:public_id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
+        Route::post('/invoices/{invoice:public_id}/send', [InvoiceController::class, 'send'])->name('invoices.send');
 
         // Payments
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-        Route::get('/invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoice-payments.index');
-        Route::post('/invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoice-payments.store');
+        Route::get('/invoices/{invoice:public_id}/payments', [PaymentController::class, 'index'])->name('invoice-payments.index');
+        Route::post('/invoices/{invoice:public_id}/payments', [PaymentController::class, 'store'])->name('invoice-payments.store');
 
         // Billing / subscription plan
         Route::get('/billing', [BillingController::class, 'show'])->name('billing.show');

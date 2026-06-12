@@ -4,7 +4,7 @@
 
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.5%2B-777BB4?logo=php&logoColor=white)
-![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
+![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9)
 ![Tests](https://img.shields.io/badge/Tests-Pest-8BC34A)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
@@ -24,18 +24,16 @@ Freelancers and small agencies lose real revenue to late payments and waste hour
 - **Automated reminders** — overdue invoices trigger reminder emails at +3, +7, and +14 days (idempotent, queue-based)
 - **Dashboard analytics** — outstanding balance, revenue this month, overdue count, revenue chart
 - **REST API (v1)** — token-authenticated API for clients, invoices, and payments
-- **Subscription billing** — Free and Pro plans for tenants, powered by Laravel Cashier
-- **Admin panel** — separate Filament panel for platform administration
+- **Plan limits** — Free plan (3 invoices/month) and Pro plan (unlimited), managed via the Stripe Customer Portal
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
 | Backend | PHP 8.5, Laravel 13 |
-| Dashboard / Admin | Filament 5 (custom theme) |
-| Public pages | Livewire 4 + Tailwind CSS |
+| UI | Livewire 4 + Tailwind CSS 4 |
 | Database | MySQL 8 |
-| Payments | Stripe (Checkout + Laravel Cashier) |
+| Payments | Stripe Checkout + Customer Portal (`stripe/stripe-php`) |
 | Auth | Session (web) + Laravel Sanctum (API) |
 | Background work | Laravel Queues + Scheduler |
 | Testing | Pest |
@@ -92,14 +90,14 @@ Log in with the seeded demo account: `demo@invoiceflow.test` / `password`.
 | `DB_*` | MySQL connection |
 | `QUEUE_CONNECTION` | `database` locally, `redis` recommended in production |
 | `MAIL_*` | Mail transport (use [Mailpit](https://github.com/axllent/mailpit) locally) |
-| `STRIPE_KEY` / `STRIPE_SECRET` | Stripe API keys |
-| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret |
-| `CASHIER_CURRENCY` | Default billing currency (e.g. `usd`) |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (`pk_test_…`) |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_…`) |
+| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (`whsec_…`) |
 
 To receive Stripe webhooks locally:
 
 ```bash
-stripe listen --forward-to localhost:8000/stripe/webhook
+stripe listen --forward-to localhost:8000/webhooks/stripe
 ```
 
 ## API
@@ -121,14 +119,18 @@ curl https://your-app.test/api/v1/invoices \
 | POST | `/api/v1/invoices/{id}/send` | Email invoice to the client |
 | GET | `/api/v1/payments` | List recorded payments |
 
+Full endpoint reference: [docs/api.md](docs/api.md).
+
 Responses follow a consistent JSON resource format; errors return RFC-style problem details with proper status codes. Rate limiting is applied per token.
 
 ## Testing
 
 ```bash
 php artisan test          # full Pest suite
-./vendor/bin/pint --test  # code style check
+composer test             # pint + phpstan + pest, same as CI
 ```
+
+The suite runs against a real MySQL database (`invoiceflow_saas_testing`) to match production engine behavior — see `docs/decisions.md` §9.
 
 The suite prioritizes the parts that must never break: **tenant isolation**, **money calculations**, **Stripe webhook handling** (with fakes), and **reminder idempotency**.
 
@@ -141,7 +143,7 @@ Tested on a standard VPS / Laravel Forge setup:
 3. `php artisan optimize` (config, route, view caching)
 4. Run queue workers under Supervisor; `php artisan queue:restart` on every deploy
 5. Add the scheduler cron: `* * * * * php artisan schedule:run`
-6. Point a Stripe webhook at `/stripe/webhook` and set `STRIPE_WEBHOOK_SECRET`
+6. Point a Stripe webhook at `/webhooks/stripe` and set `STRIPE_WEBHOOK_SECRET`
 
 ## Roadmap
 

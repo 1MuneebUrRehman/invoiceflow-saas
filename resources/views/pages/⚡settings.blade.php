@@ -29,6 +29,10 @@ new #[Title('Settings')] class extends Component
     public string $new_password = '';
     public string $new_password_confirmation = '';
 
+    // API tokens
+    public string $token_name = '';
+    public ?string $plainTextToken = null;
+
     public function mount(): void
     {
         $user = auth()->user();
@@ -128,6 +132,37 @@ new #[Title('Settings')] class extends Component
         $this->dispatch('notify', message: 'Password updated.', type: 'success');
     }
 
+    public function createToken(): void
+    {
+        $this->validate([
+            'token_name' => 'required|string|max:255',
+        ]);
+
+        $this->plainTextToken = auth()->user()
+            ->createToken($this->token_name)
+            ->plainTextToken;
+
+        $this->reset('token_name');
+        $this->dispatch('notify', message: 'API token created. Copy it now — it will not be shown again.', type: 'success');
+    }
+
+    public function revokeToken(int $tokenId): void
+    {
+        auth()->user()->tokens()->whereKey($tokenId)->delete();
+
+        $this->dispatch('notify', message: 'API token revoked.', type: 'success');
+    }
+
+    public function dismissPlainTextToken(): void
+    {
+        $this->plainTextToken = null;
+    }
+
+    public function getApiTokens()
+    {
+        return auth()->user()->tokens()->latest()->get();
+    }
+
     public function getCurrencyOptions(): array
     {
         return Tenant::currencyOptions();
@@ -156,6 +191,7 @@ new #[Title('Settings')] class extends Component
             ['id' => 'business', 'label' => 'Business',  'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'],
             ['id' => 'account',  'label' => 'Account',   'icon' => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
             ['id' => 'security', 'label' => 'Security',  'icon' => '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'],
+            ['id' => 'api',      'label' => 'API Tokens', 'icon' => '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'],
         ] as $t)
             <button
                 x-on:click="tab = '{{ $t['id'] }}'"
@@ -334,5 +370,93 @@ new #[Title('Settings')] class extends Component
                 </button>
             </div>
         </form>
+    </div>
+
+    {{-- API Tokens tab --}}
+    <div x-show="tab === 'api'" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="display: none">
+        <div class="mt-6 space-y-6">
+            @if ($plainTextToken)
+                <div class="rounded-card border border-verdant/25 bg-verdant/5 p-5">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <h3 class="font-display text-sm font-semibold text-midnight">Your new API token</h3>
+                            <p class="mt-0.5 text-xs text-slate">Copy it now — it will not be shown again.</p>
+                            <code class="mt-3 block break-all rounded-field bg-white px-3 py-2.5 font-mono text-xs text-midnight ring-1 ring-midnight/10 select-all">{{ $plainTextToken }}</code>
+                        </div>
+                        <button
+                            type="button"
+                            wire:click="dismissPlainTextToken"
+                            class="shrink-0 rounded-field px-2.5 py-1.5 text-xs font-medium text-slate ring-1 ring-midnight/10 transition hover:bg-mist"
+                        >
+                            Dismiss
+                        </button>
+                    </div>
+                </div>
+            @endif
+
+            <form wire:submit="createToken">
+                <div class="rounded-card bg-white p-6 shadow-card ring-1 ring-midnight/5">
+                    <h2 class="font-display text-base font-semibold text-midnight">Create API token</h2>
+                    <p class="mt-0.5 text-sm text-slate">Tokens authenticate requests to the REST API (<code class="font-mono text-xs">/api/v1</code>) as a <code class="font-mono text-xs">Bearer</code> header.</p>
+
+                    <div class="mt-5 flex items-end gap-3">
+                        <div class="grow">
+                            <x-ui.label for="token_name">Token name</x-ui.label>
+                            <x-ui.input id="token_name" type="text" wire:model="token_name" placeholder="e.g. Zapier integration" />
+                            <x-ui.error for="token_name" />
+                        </div>
+                        <button
+                            type="submit"
+                            class="rounded-field bg-lapis px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-lapis-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lapis disabled:opacity-60"
+                        >
+                            <span wire:loading.remove wire:target="createToken">Create token</span>
+                            <span wire:loading wire:target="createToken">Creating…</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="rounded-card bg-white p-6 shadow-card ring-1 ring-midnight/5">
+                <h2 class="font-display text-base font-semibold text-midnight">Active tokens</h2>
+                <p class="mt-0.5 text-sm text-slate">Revoking a token immediately blocks API requests that use it.</p>
+
+                @php($apiTokens = $this->getApiTokens())
+
+                @if ($apiTokens->isEmpty())
+                    <p class="mt-5 text-sm text-slate">No API tokens yet.</p>
+                @else
+                    <ul class="mt-5 divide-y divide-midnight/6">
+                        @foreach ($apiTokens as $apiToken)
+                            <li class="flex items-center justify-between gap-4 py-3">
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-medium text-midnight">{{ $apiToken->name }}</p>
+                                    <p class="mt-0.5 text-xs text-slate">
+                                        Created {{ $apiToken->created_at->diffForHumans() }}
+                                        · {{ $apiToken->last_used_at ? 'Last used '.$apiToken->last_used_at->diffForHumans() : 'Never used' }}
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    data-confirm-title="Revoke Token"
+                                    data-confirm-message="Revoke “{{ $apiToken->name }}”? Requests using it will stop working immediately."
+                                    data-confirm-label="Revoke"
+                                    data-confirm-variant="danger"
+                                    x-on:click="$dispatch('confirm-action', {
+                                        title: $el.dataset.confirmTitle,
+                                        message: $el.dataset.confirmMessage,
+                                        confirmLabel: $el.dataset.confirmLabel,
+                                        variant: $el.dataset.confirmVariant,
+                                        onConfirm: () => $wire.revokeToken({{ $apiToken->id }})
+                                    })"
+                                    class="shrink-0 rounded-field px-2.5 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
+                                >
+                                    Revoke
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
     </div>
 </div>

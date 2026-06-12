@@ -1,10 +1,12 @@
 <?php
 
+use App\Actions\Invoices\GenerateInvoiceNumber;
 use App\Enums\InvoiceStatus;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Tenant;
 use App\Tenancy\CurrentTenant;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Number;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -71,34 +73,38 @@ new #[Title('New Invoice')] class extends Component
             }
         }
 
-        $count = Invoice::withTrashed()->count() + 1;
-        $number = sprintf('INV-%d-%04d', now()->year, $count);
+        $number = DB::transaction(function () use ($rawItems): string {
+            $tenantId = app(CurrentTenant::class)->id();
+            $number = app(GenerateInvoiceNumber::class)->execute($tenantId, now()->year);
 
-        $invoice = Invoice::create([
-            'client_id'   => $this->client_id,
-            'number'      => $number,
-            'status'      => InvoiceStatus::Draft,
-            'currency'    => $this->currency,
-            'tax_rate'    => $this->tax_rate,
-            'issue_date'  => $this->issue_date,
-            'due_date'    => $this->due_date,
-            'notes'       => $this->notes ?: null,
-            'subtotal'    => 0,
-            'tax_amount'  => 0,
-            'total'       => 0,
-            'amount_paid' => 0,
-        ]);
-
-        foreach ($rawItems as $pos => $item) {
-            $invoice->items()->create([
-                'description' => $item['description'],
-                'quantity'    => (float) ($item['quantity'] ?? 1),
-                'unit_price'  => (int) round((float) ($item['unit_price'] ?? 0) * 100),
-                'position'    => $pos,
+            $invoice = Invoice::create([
+                'client_id'   => $this->client_id,
+                'number'      => $number,
+                'status'      => InvoiceStatus::Draft,
+                'currency'    => $this->currency,
+                'tax_rate'    => $this->tax_rate,
+                'issue_date'  => $this->issue_date,
+                'due_date'    => $this->due_date,
+                'notes'       => $this->notes ?: null,
+                'subtotal'    => 0,
+                'tax_amount'  => 0,
+                'total'       => 0,
+                'amount_paid' => 0,
             ]);
-        }
 
-        $invoice->recalculateTotals();
+            foreach ($rawItems as $pos => $item) {
+                $invoice->items()->create([
+                    'description' => $item['description'],
+                    'quantity'    => (float) ($item['quantity'] ?? 1),
+                    'unit_price'  => (int) round((float) ($item['unit_price'] ?? 0) * 100),
+                    'position'    => $pos,
+                ]);
+            }
+
+            $invoice->recalculateTotals();
+
+            return $number;
+        });
 
         session()->flash('success', "Invoice {$number} created.");
         $this->redirect(route('invoices.index'));

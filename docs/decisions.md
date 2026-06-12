@@ -10,7 +10,7 @@ A running log of significant decisions and their trade-offs. Newest entries at t
 
 **Why:** At freelancer/small-agency scale, single-database is operationally simpler in every dimension: one migration run, trivial backups, cheap hosting, easy cross-tenant admin reporting and aggregate metrics.
 
-**Trade-off:** Isolation is enforced at the application layer, not the infrastructure layer — a missed scope is a data leak, which is why tenant isolation has its own dedicated test suite (`tests/Feature/Tenancy/`). Noisy-neighbor performance is shared. The escape hatch: `tenant_id` on every table makes a later per-tenant export/migration mechanical.
+**Trade-off:** Isolation is enforced at the application layer, not the infrastructure layer — a missed scope is a data leak, which is why cross-tenant access is asserted throughout the API test suite (`tests/Feature/Api/`). Noisy-neighbor performance is shared. The escape hatch: `tenant_id` on every table makes a later per-tenant export/migration mechanical.
 
 **Rejected alternative:** Database-per-tenant (stancl/tenancy style) — stronger isolation, but multiplies operational cost (N migrations, N backups, connection juggling) for no benefit at this scale.
 

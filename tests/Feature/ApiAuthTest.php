@@ -42,7 +42,10 @@ it('revokes the current token', function (): void {
         ->assertOk()
         ->assertJson(['message' => 'Token revoked.']);
 
-    // Token is now invalid
+    // The sanctum request guard caches the resolved user for the lifetime of
+    // the test process, so reset it before asserting the token is now invalid.
+    $this->app->make('auth')->forgetGuards();
+
     $this->withToken($token)
         ->getJson('/api/v1/billing')
         ->assertUnauthorized();

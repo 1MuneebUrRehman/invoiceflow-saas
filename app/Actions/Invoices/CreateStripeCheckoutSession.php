@@ -23,7 +23,7 @@ class CreateStripeCheckoutSession
             'success_url' => route('invoices.payment.callback', ['publicId' => $invoice->public_id, 'result' => 'success']),
             'cancel_url' => route('invoices.payment.callback', ['publicId' => $invoice->public_id, 'result' => 'cancel']),
             'metadata' => [
-                'invoice_id' => $invoice->id,
+                'invoice_id' => (string) $invoice->id,
                 'public_id' => $invoice->public_id,
             ],
             'line_items' => [[

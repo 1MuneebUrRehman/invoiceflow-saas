@@ -20,6 +20,8 @@ class MarkInvoicePaid
      * which the caller (webhook controller) should treat as a 200 no-op.
      *
      * Safe to call from console/queue context (no CurrentTenant required).
+     *
+     * @param  array<string, mixed>|null  $providerPayload
      */
     public function execute(
         Invoice $invoice,
