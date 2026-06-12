@@ -60,15 +60,16 @@ class DemoTenantSeeder extends Seeder
         $invoiceNum = 1;
 
         // ── Paid invoices (last 12 months, spread for the revenue chart) ──────
+        // manual_payment: true means PaymentProvider::Manual instead of Stripe
         $paidScenarios = [
             ['client' => 0, 'description' => 'Brand Identity Package', 'qty' => 1, 'price' => 480000, 'months_ago' => 11],
             ['client' => 1, 'description' => 'Analytics Dashboard Design', 'qty' => 1, 'price' => 320000, 'months_ago' => 10],
             ['client' => 2, 'description' => 'Frontend Development Sprint', 'qty' => 80, 'price' => 9500, 'months_ago' => 9],
-            ['client' => 0, 'description' => 'Website Redesign', 'qty' => 1, 'price' => 650000, 'months_ago' => 8],
+            ['client' => 0, 'description' => 'Website Redesign', 'qty' => 1, 'price' => 650000, 'months_ago' => 8, 'manual_payment' => true],
             ['client' => 3, 'description' => 'E-commerce UX Audit', 'qty' => 1, 'price' => 180000, 'months_ago' => 7],
             ['client' => 4, 'description' => 'Marketing Site Build', 'qty' => 1, 'price' => 550000, 'months_ago' => 6],
             ['client' => 1, 'description' => 'Data Visualisation Components', 'qty' => 12, 'price' => 18000, 'months_ago' => 5],
-            ['client' => 5, 'description' => 'SaaS Onboarding Flow', 'qty' => 1, 'price' => 280000, 'months_ago' => 4],
+            ['client' => 5, 'description' => 'SaaS Onboarding Flow', 'qty' => 1, 'price' => 280000, 'months_ago' => 4, 'manual_payment' => true],
             ['client' => 2, 'description' => 'API Integration Work', 'qty' => 40, 'price' => 9500, 'months_ago' => 3],
             ['client' => 0, 'description' => 'Annual Retainer Q1', 'qty' => 1, 'price' => 400000, 'months_ago' => 2],
             ['client' => 3, 'description' => 'Mobile App UI Kit', 'qty' => 1, 'price' => 220000, 'months_ago' => 1],
@@ -106,13 +107,15 @@ class DemoTenantSeeder extends Seeder
                 'position' => 0,
             ]);
 
+            $isManual = $s['manual_payment'] ?? false;
+
             (new Payment)->forceFill([
                 'tenant_id' => $tenant->id,
                 'invoice_id' => $invoice->id,
                 'amount' => $total,
                 'currency' => 'USD',
-                'provider' => PaymentProvider::Stripe,
-                'provider_reference' => 'pi_'.Str::random(24),
+                'provider' => $isManual ? PaymentProvider::Manual : PaymentProvider::Stripe,
+                'provider_reference' => $isManual ? null : 'pi_'.Str::random(24),
                 'paid_at' => $paidAt,
             ])->save();
         }
@@ -215,6 +218,36 @@ class DemoTenantSeeder extends Seeder
             ]);
         }
 
+        // ── Cancelled invoices ────────────────────────────────────────────────
+        $cancelledScenarios = [
+            ['client' => 2, 'item' => 'Cancelled Scope Change', 'price' => 95000, 'days_ago' => 20],
+            ['client' => 5, 'item' => 'Project Abandoned', 'price' => 210000, 'days_ago' => 35],
+        ];
+
+        foreach ($cancelledScenarios as $s) {
+            $issueDate = CarbonImmutable::now()->subDays($s['days_ago']);
+
+            $invoice = Invoice::factory()->for($tenant)->for($clients->get($s['client']))->create([
+                'number' => sprintf('INV-%d-%04d', now()->year, $invoiceNum++),
+                'status' => InvoiceStatus::Cancelled,
+                'subtotal' => $s['price'],
+                'tax_rate' => 0,
+                'tax_amount' => 0,
+                'total' => $s['price'],
+                'amount_paid' => 0,
+                'issue_date' => $issueDate,
+                'due_date' => $issueDate->addDays(14),
+                'sent_at' => $issueDate,
+            ]);
+
+            $invoice->items()->create([
+                'description' => $s['item'],
+                'quantity' => 1,
+                'unit_price' => $s['price'],
+                'position' => 0,
+            ]);
+        }
+
         // ── Second tenant (Free plan, isolated data) ──────────────────────────
         $currentTenant->forget();
 
@@ -270,8 +303,22 @@ class DemoTenantSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Seeded: Northline Studio (Pro, demo@invoiceflow.test / password)');
-        $this->command->info('Seeded: Pixel & Co. (Free, sam@invoiceflow.test / password)');
-        $this->command->info('API token printed above during seeding — use it in Authorization: Bearer <token>');
+        $this->command->newLine();
+        $this->command->line('┌─────────────────────────────────────────────────────────┐');
+        $this->command->line('│              InvoiceFlow — Demo Credentials              │');
+        $this->command->line('├─────────────────────────────────────────────────────────┤');
+        $this->command->line('│  Tenant: Northline Studio (Pro plan)                    │');
+        $this->command->line('│  Owner:  demo@invoiceflow.test  /  password             │');
+        $this->command->line('│  Member: member@invoiceflow.test  /  password           │');
+        $this->command->line('│                                                         │');
+        $this->command->line('│  6 clients · 12 paid · 3 sent · 3 overdue              │');
+        $this->command->line('│  2 draft · 2 cancelled · 2 manual payments             │');
+        $this->command->line('├─────────────────────────────────────────────────────────┤');
+        $this->command->line('│  Tenant: Pixel & Co. (Free plan / GBP)                 │');
+        $this->command->line('│  Owner:  sam@invoiceflow.test  /  password              │');
+        $this->command->line('│                                                         │');
+        $this->command->line('│  1 client · 2 paid · 1 sent                            │');
+        $this->command->line('└─────────────────────────────────────────────────────────┘');
+        $this->command->newLine();
     }
 }

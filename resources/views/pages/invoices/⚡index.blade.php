@@ -228,8 +228,17 @@ new #[Title('Invoices')] class extends Component
                                     @else
                                         @if ($invoice->status === InvoiceStatus::Draft || $invoice->status->isPayable())
                                             <button
-                                                wire:click="sendInvoice({{ $invoice->id }})"
-                                                wire:confirm="Send {{ $invoice->number }} to {{ $invoice->client?->email }}?"
+                                                data-confirm-title="Send Invoice"
+                                                data-confirm-message="Send {{ $invoice->number }} to {{ $invoice->client?->email }}?"
+                                                data-confirm-label="Send"
+                                                data-confirm-variant="info"
+                                                x-on:click="$dispatch('confirm-action', {
+                                                    title: $el.dataset.confirmTitle,
+                                                    message: $el.dataset.confirmMessage,
+                                                    confirmLabel: $el.dataset.confirmLabel,
+                                                    variant: $el.dataset.confirmVariant,
+                                                    onConfirm: () => $wire.sendInvoice({{ $invoice->id }})
+                                                })"
                                                 class="rounded-field px-2.5 py-1.5 text-xs font-medium text-lapis ring-1 ring-lapis/20 transition hover:bg-lapis/8"
                                             >
                                                 Send
@@ -250,8 +259,17 @@ new #[Title('Invoices')] class extends Component
                                             Edit
                                         </a>
                                         <button
-                                            wire:click="delete({{ $invoice->id }})"
-                                            wire:confirm="Delete {{ $invoice->number }}? This cannot be undone."
+                                            data-confirm-title="Delete Invoice"
+                                            data-confirm-message="Delete {{ $invoice->number }}? This cannot be undone."
+                                            data-confirm-label="Delete"
+                                            data-confirm-variant="danger"
+                                            x-on:click="$dispatch('confirm-action', {
+                                                title: $el.dataset.confirmTitle,
+                                                message: $el.dataset.confirmMessage,
+                                                confirmLabel: $el.dataset.confirmLabel,
+                                                variant: $el.dataset.confirmVariant,
+                                                onConfirm: () => $wire.delete({{ $invoice->id }})
+                                            })"
                                             class="rounded-field px-2.5 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
                                         >
                                             Delete

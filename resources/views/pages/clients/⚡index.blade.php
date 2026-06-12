@@ -148,8 +148,17 @@ new #[Title('Clients')] class extends Component
                                             Edit
                                         </a>
                                         <button
-                                            wire:click="delete({{ $client->id }})"
-                                            wire:confirm="Archive {{ $client->name }}? Their invoices will be kept."
+                                            data-confirm-title="Archive Client"
+                                            data-confirm-message="Archive {{ $client->name }}? Their invoices will be kept."
+                                            data-confirm-label="Archive"
+                                            data-confirm-variant="danger"
+                                            x-on:click="$dispatch('confirm-action', {
+                                                title: $el.dataset.confirmTitle,
+                                                message: $el.dataset.confirmMessage,
+                                                confirmLabel: $el.dataset.confirmLabel,
+                                                variant: $el.dataset.confirmVariant,
+                                                onConfirm: () => $wire.delete({{ $client->id }})
+                                            })"
                                             class="rounded-field px-3 py-1.5 text-xs font-medium text-garnet ring-1 ring-garnet/20 transition hover:bg-garnet/8"
                                         >
                                             Archive

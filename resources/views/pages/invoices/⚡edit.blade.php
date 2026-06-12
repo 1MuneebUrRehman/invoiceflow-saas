@@ -158,8 +158,17 @@ new #[Title('Edit Invoice')] class extends Component
         @endphp
         @if ($canSend)
             <button
-                wire:click="sendNow"
-                wire:confirm="Send {{ $number }} to the client?"
+                data-confirm-title="Send Invoice"
+                data-confirm-message="Send {{ $number }} to the client?"
+                data-confirm-label="Send invoice"
+                data-confirm-variant="info"
+                x-on:click="$dispatch('confirm-action', {
+                    title: $el.dataset.confirmTitle,
+                    message: $el.dataset.confirmMessage,
+                    confirmLabel: $el.dataset.confirmLabel,
+                    variant: $el.dataset.confirmVariant,
+                    onConfirm: () => $wire.sendNow()
+                })"
                 class="flex items-center gap-2 rounded-field bg-verdant px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-verdant/90"
             >
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
