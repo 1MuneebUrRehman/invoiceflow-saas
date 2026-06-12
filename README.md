@@ -77,11 +77,62 @@ Configure your database and Stripe keys in `.env` (see below), then:
 
 ```bash
 php artisan migrate --seed   # seeds a demo tenant with sample invoices
+php artisan storage:link     # required for tenant logo uploads
 php artisan queue:work       # required for PDFs, emails, reminders
 php artisan serve
 ```
 
 Log in with the seeded demo account: `demo@invoiceflow.test` / `password`.
+
+### Running the App
+
+The easiest way to run everything for development (server + queue worker + logs + Vite) in one command:
+
+```bash
+composer run dev
+```
+
+Or run each piece yourself:
+
+| Command | Purpose |
+|---|---|
+| `php artisan serve` | HTTP server at `http://localhost:8000` |
+| `php artisan queue:work` | Queue worker — **required**; PDFs, invoice emails, and reminders are queued |
+| `npm run dev` | Vite dev server (hot-reloads CSS/JS) — or `npm run build` for a one-off build |
+| `php artisan pail` | Tail application logs |
+| `php artisan schedule:work` | Run the scheduler locally (overdue marking at 00:05, reminders at 09:00) |
+
+Scheduled jobs can also be triggered manually at any time:
+
+```bash
+php artisan invoices:mark-overdue     # mark sent invoices past their due date as overdue
+php artisan invoices:send-reminders   # queue reminder emails at +3/+7/+14 days overdue
+php artisan schedule:list             # see what is scheduled and when
+```
+
+### Local Development with Lerd
+
+This repository's local environment uses [Lerd](https://lerd.dev) (PHP 8.5, MySQL, Redis, Mailpit in containers). If you use it, prefix every PHP-related command so it runs inside the project container:
+
+```bash
+lerd console <artisan-command>    # e.g. lerd console migrate --seed
+lerd composer <composer-command>  # e.g. lerd composer test
+lerd test                         # run the Pest suite
+lerd db:create                    # create the app + testing databases
+```
+
+Mailpit is bundled with Lerd, so locally sent emails can be inspected in its web UI.
+
+### Useful Verification Commands
+
+```bash
+composer test                          # full check: pint + phpstan + pest (same as CI)
+php artisan test --compact             # Pest suite only
+vendor/bin/pint --dirty                # auto-fix code style on changed files
+vendor/bin/phpstan analyse --memory-limit=1G  # static analysis (level 7)
+php artisan route:list --path=api      # confirm API routes
+php artisan config:show services.stripe      # confirm Stripe keys are loaded
+```
 
 ### Environment Configuration
 
@@ -94,11 +145,13 @@ Log in with the seeded demo account: `demo@invoiceflow.test` / `password`.
 | `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_…`) |
 | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (`whsec_…`) |
 
-To receive Stripe webhooks locally:
+To receive Stripe webhooks locally, install the [Stripe CLI](https://docs.stripe.com/stripe-cli) and run:
 
 ```bash
 stripe listen --forward-to localhost:8000/webhooks/stripe
 ```
+
+Copy the `whsec_…` secret it prints into `STRIPE_WEBHOOK_SECRET` in `.env`. You can then pay invoices end-to-end with the test card `4242 4242 4242 4242`.
 
 ## API
 
