@@ -26,7 +26,11 @@ clients, invoices, payments, and reminders in one place, and automates the chasi
 
 ### 🗂 Manage your clients
 Keep all your clients in one place — contact details, company, billing address, preferred
-currency, and private notes. Find anyone instantly with search.
+currency, and private notes. Find anyone instantly with search. Remove a client and
+nothing is truly lost — records are archived safely rather than wiped.
+
+InvoiceFlow supports **24+ currencies** (USD, EUR, GBP, CAD, AUD, INR, PKR, AED, and
+more), so you can bill clients in whatever currency they expect.
 
 ### 🧾 Create professional invoices in minutes
 - Add line items with quantities and prices; taxes and discounts are calculated for you.

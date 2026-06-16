@@ -48,6 +48,9 @@ Stripe Customer Portal.
 ### 3.2 Client management (CRM-lite)
 - CRUD for clients: name, company, email, phone, full address, preferred currency, notes.
 - Searchable client list (name / email / company) in both UI and API.
+- Clients are **soft-deleted** (`SoftDeletes`) so historical invoices keep their referent.
+- **24+ supported currencies** (USD/EUR/GBP/CAD/AUD/INR/PKR/AED/… ) defined on the
+  `Tenant` model; each tenant has a default currency and each client/invoice can override.
 
 ### 3.3 Invoice builder
 - Line items (description, quantity, unit price), invoice-level tax rate, discounts.

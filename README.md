@@ -11,6 +11,17 @@
 <!-- Screenshot: dashboard -->
 <!-- Screenshot: public invoice payment page -->
 
+## Documentation
+
+| Audience | Document |
+|---|---|
+| Clients / prospects (plain language) | [docs/PROJECT_OVERVIEW_CLIENT.md](docs/PROJECT_OVERVIEW_CLIENT.md) |
+| Technical / interview deep-dive | [docs/PROJECT_OVERVIEW_INTERVIEW.md](docs/PROJECT_OVERVIEW_INTERVIEW.md) |
+| Portfolio case study | [docs/PORTFOLIO.md](docs/PORTFOLIO.md) |
+| API reference | [docs/api.md](docs/api.md) |
+| Architecture decisions | [docs/decisions.md](docs/decisions.md) |
+| Design system | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) |
+
 ## The Problem
 
 Freelancers and small agencies lose real revenue to late payments and waste hours every month creating invoices, sending follow-ups, and reconciling who has paid. InvoiceFlow centralizes clients, invoices, payments, and reminders in one place — so getting paid stops being a part-time job.
@@ -213,4 +224,5 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-Built by **[Your Name]** — Laravel full-stack developer. [Portfolio](#) · [LinkedIn](#) · [Email](#)
+Built by **Muneeb ur Rehman** — Laravel full-stack developer.
+Portfolio <!-- TODO: add URL --> · LinkedIn <!-- TODO: add URL --> · Email <!-- TODO: add address -->
